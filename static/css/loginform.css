@@ -1,0 +1,125 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+form {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Input Styles */
+input[type="text"], input[type="email"], input[type="password"], textarea {
+    width: 100%;
+    padding: 14px 18px;
+    margin: 12px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.4s ease;
+}
+
+input:focus, textarea:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 0 10px rgba(106, 17, 203, 0.6);
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* Button Styles */
+button {
+    background: linear-gradient(90deg, #6a11cb, #2575fc);
+    color: #fff;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.4s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(90deg, #2575fc, #6a11cb);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Label and Headings */
+label {
+    font-size: 15px;
+    color: #444;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+}
+
+h2 {
+    text-align: center;
+    color: #2575fc;
+    margin-bottom: 25px;
+    animation: slideInDown 1.2s ease-in-out;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animation Enhancements */
+button {
+    animation: buttonPop 1.5s infinite alternate;
+}
+
+@keyframes buttonPop {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    form {
+        padding: 20px;
+    }
+
+    button {
+        width: 100%;
+    }
+}
