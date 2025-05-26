@@ -1,0 +1,201 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard - Modernized{% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+
+{% endblock %}
+
+{% block stylesheet %}
+<head>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include Notify.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-notify@3.1.3/dist/bootstrap-notify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-notify@3.1.3/dist/bootstrap-notify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #e6eef7; /* New background color */
+    }
+
+.welcome-banner {
+    background: linear-gradient(89deg, #f73f04, #2e5379);
+    color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+    .welcome-banner h2 {
+        font-size: 2.5rem;
+        margin: 0;
+    }
+
+    .welcome-banner p {
+        font-size: 1.2rem;
+        margin: 10px 0 0;
+    }
+
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        width: 300px;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-card i {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: #4a6fa5; /* Updated icon color */
+    }
+
+    .stat-card h3 {
+        font-size: 1.5rem;
+        margin: 10px 0;
+        color: #333;
+    }
+
+    .stat-card p {
+        font-size: 1rem;
+        color: #777;
+    }
+
+    @media (max-width: 768px) {
+        .card-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-card {
+            width: 100%;
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Welcome Banner -->
+        <div class="row">
+            <div class="col-12">
+                <div class="welcome-banner">
+                    <h2>Welcome, {{ request.user.username }}!</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="card-container">
+            {% if request.user.is_superuser and request.user.is_staff %}
+            <!-- Admin Stats -->
+            <div class="stat-card">
+                <a href="{% url 'dashboard:employees' %}">
+                    <i class="fa fa-users"></i>
+                    <h3>Registered Employees</h3>
+                    <p>{{ employees.count }}</p>
+                </a>
+            </div>
+
+            <div class="stat-card">
+                <a href="{% url 'Leave:leaveslist' %}">
+                    <i class="fa fa-calendar-alt"></i>
+                    <h3>Leaves Requested</h3>
+                    <p>{{ leaves.count }}</p>
+                </a>
+            </div>
+            <div class="stat-card">
+                <a href="{% url 'Leave:leavesapprovedlist' %}">
+                    <i class="bi bi-check-circle"></i>
+                    <h3>Approved Leaves:</h3>
+                    <p>{{ leave_list.count }}</p> <!-- Ensure default value is shown if missing -->
+                </a>
+            </div>
+            <div class="stat-card">
+                <a href="{% url 'Leave:leavesrejected' %}">
+                    <i class="bi bi-x-octagon"></i>
+                    <h3> Rejected Leaves</h3>
+                </a>
+            </div>
+            <div class="stat-card">
+                <a href="{% url 'attendance:all_attendance_history' %}">
+                    <i class="bi bi-clock-history" style="font-size: 20px; margin-right: 8px;"></i>
+                    <h3>Attendance History:</h3>
+                </a>
+            </div>
+            <div class="stat-card">
+                <a href="{% url 'Leave:createleave' %}">
+                    <i class="bi bi-pencil" style="font-size: 20px; margin-right: 8px;"></i>
+                    <h3>Apply Leave:</h3>
+                </a>
+            </div>
+            {% else %}
+            <div class="stat-card">
+                <a href="{% url 'Leave:leave_balance' %}">
+                    <i class="bi bi-wallet2" style="font-size: 20px; margin-right: 8px;"></i>
+                    <h3>Leave Balance:</h3>
+                </a>
+            </div>
+            <div class="stat-card">
+                <a href="{% url 'Leave:staffleavetable' %}">
+                    <i class="bi bi-clock-history" style="font-size: 20px; margin-right: 8px;"></i>
+                    <h3>Leave History:</h3>
+                </a>
+            </div>
+            <div class="stat-card">
+                <a href="{% url 'Leave:createleave' %}">
+                    <i class="bi bi-pencil" style="font-size: 20px; margin-right: 8px;"></i>
+                    <h3>Apply Leave:</h3>
+                </a>
+            </div>
+
+            {% endif %}
+        </div>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+
+    $(document).ready(function () {
+        let username = '{{ request.user.username }}';
+        if (username) {
+            $.notify({
+                icon: 'fa fa-user',
+                message: `Welcome to Leave Management System, ${username}`
+            }, {
+                type: 'success',
+                timer: 3000
+            });
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}

@@ -1,0 +1,377 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<style>
+    /* General Body Styles */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(45deg, #f3f4f6, #e2e8f0);
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-wrapper {
+        background: #fff;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-top: 2rem;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .form-wrapper:hover {
+        transform: translateY(-4px);
+    }
+
+    /* Employee Name Section */
+    .employee-name-title {
+        color: #4a90e2;
+        font-weight: bold;
+        font-size: 2rem;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        letter-spacing: 2px;
+        text-align: center;
+    }
+
+    /* Image Styling */
+    .employee-image-wrapper {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .rounded-circle-image {
+        border-radius: 50%;
+        width: 150px; /* Decreased size */
+        height: 150px; /* Decreased size */
+        object-fit: cover;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .rounded-circle-image:hover {
+        transform: scale(1.1);
+    }
+
+    /* Info Card */
+    .info-card {
+        margin-top: 1.5rem;
+        padding: 2rem;
+        background-color: #fff;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .list-group-item {
+        background-color: #fff;
+        border: 1px solid #e4e4e4;
+        margin-bottom: 12px;
+        padding: 15px;
+        font-size: 16px;
+        border-radius: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Alert Styles */
+    .alert-warning {
+        background-color: #ff9800;
+        color: #fff;
+        border-radius: 6px;
+    }
+
+    .alert-success {
+        background-color: #4caf50;
+        color: #fff;
+        border-radius: 6px;
+    }
+
+    .alert {
+        font-size: 16px;
+        margin-bottom: 1.5rem;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert .close {
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+    }
+
+    .alert .close:hover {
+        opacity: 1;
+    }
+
+    /* Button Styles */
+    .btn {
+        transition: all 0.3s ease;
+        border-radius: 50px;
+        padding: 12px 25px;  /* Slightly increased padding for a more balanced look */
+        font-weight: 600;
+        font-size: 16px; /* Added font size for better readability */
+        text-transform: uppercase;
+        background-color: #4CAF50; /* Fresh green for primary action */
+        color: #fff;
+        border: none; /* Removed border for a sleek look */
+    }
+
+    .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        background-color: #45a049; /* Darker shade for hover effect */
+    }
+
+    .btn-group .btn {
+        width: 30%;
+        font-size: 16px;
+    }
+
+    .btn-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+    }
+
+    /* Additional Button Variants */
+    .btn-danger {
+        background-color: #f44336; /* Vibrant red for cancel/decline actions */
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #d32f2f; /* Darker red for hover effect */
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-info {
+        background-color: #4c7eaf; /* Soft blue for information actions */
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: #0097a7; /* Darker blue for hover effect */
+    }
+
+    .btn-success {
+        background-color: #8bc34a; /* Green for success actions */
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #7cb342; /* Darker green for hover effect */
+    }
+
+    /* Spinner */
+    #spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    #spinner .spinner-border {
+        width: 4rem;
+        height: 4rem;
+        border-width: 4px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 767px) {
+        .employee-name-title {
+            font-size: 1.8rem;
+        }
+
+        .rounded-circle-image {
+            width: 130px; /* Further decreased size */
+            height: 130px; /* Further decreased size */
+        }
+
+        .list-group-item {
+            font-size: 14px;
+        }
+
+        .btn-group .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+        }
+    }
+    /* Danger Button (Decline) */
+/* Ensure the decline button has the correct styles */
+.btn-danger {
+    background-color: #f44336 !important; /* Force red background */
+    color: #fff !important; /* Ensure text color is white */
+    font-size: 16px !important; /* Ensure font size is correct */
+    padding: 12px 25px !important; /* Adjust padding */
+    border-radius: 50px !important; /* Rounded corners */
+    transition: all 0.3s ease !important; /* Smooth transition */
+    margin: 0 5px; /* Add margin for spacing */
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f !important; /* Darker red for hover effect */
+    transform: scale(1.05) !important; /* Slight scale-up on hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important; /* Shadow on hover */
+}
+
+/* Ensure buttons in the button group are aligned properly */
+.btn-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Align buttons vertically */
+}
+
+.btn-group .btn {
+    flex: 1; /* Ensure buttons take equal space */
+    margin: 0 5px; /* Add margin for spacing */
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Display success and error messages -->
+        {% if messages %}
+        <div>
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Employee Details -->
+        <h3 class="employee-name-title">{{ employee.get_full_name }}</h3>
+        <div class="employee-image-wrapper text-center">
+            <img src="{{ employee.image.url }}" class="img-fluid rounded-circle-image" alt="Employee Image">
+        </div>
+
+        <!-- Leave Details -->
+        <div class="info-card mt-3">
+            <div class="list-group">
+                <a class="list-group-item">
+                    <span>Employee Name:</span>
+                    <div><b>{{ employee.get_full_name }}</b></div>
+                </a>
+                <a class="list-group-item">
+                    <span>Employee ID:</span>
+                    <div><b>{{ employee.employeeid }}</b></div>
+                </a>
+                <a class="list-group-item">
+                    <span>Leave Start Date:</span>
+                    <div><b>{{ leave.startdate }}</b></div>
+                </a>
+                <a class="list-group-item">
+                    <span>Leave End Date:</span>
+                    <div><b>{{ leave.enddate }}</b></div>
+                </a>
+                <a class="list-group-item">
+                    <span>Duration:</span>
+                    <div><b>{{ leave.leave_days }}</b></div>
+                </a>
+                <a class="list-group-item">
+                    <span>Type:</span>
+                    <div><b>{{ leave.leavetype }} : {{ leave.leave_category }}</b></div>
+                </a>
+                {% if leave.leavetype == "half day" %}
+                <a class="list-group-item">
+                    <span>Start Time:</span>
+                    <div><b>{{ leave.start_time }}</b></div>
+                </a>
+                <a class="list-group-item">
+                    <span>End Time:</span>
+                    <div><b>{{ leave.end_time }}</b></div>
+                </a>
+                {% endif %}
+                <a class="list-group-item">
+                    <span>Reason:</span>
+                    <div><b>{{ leave.reason }}</b></div>
+                </a>
+                <a class="list-group-item">
+                    <span>Status:</span>
+                    <div><b>{{ leave.status }}</b></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Action Buttons for Admin -->
+        {% if request.user.is_superuser %}
+        <div class="btn-group mt-3">
+            {% if leave.is_approved %}
+            <!-- DECLINE BUTTON -->
+            <form action="{% url 'Leave:userleaveunapprove' leave.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit"
+                        class="btn btn-danger btn-lg px-4 py-2"
+                        onclick="return confirm('Are you sure you want to Decline this leave?');"
+                        data-toggle="tooltip" title="Decline Leave">
+                    <i class="fas fa-times-circle"></i> Decline
+                </button>
+            </form>
+            {% else %}
+            <!-- APPROVE BUTTON -->
+            <a href="{% url 'Leave:userleaveapprove' leave.id %}"
+               class="btn btn-success btn-lg px-4 py-2"
+               data-toggle="tooltip" title="Approve this leave request">
+                <i class="fas fa-check-circle"></i> Approve
+            </a>
+            {% endif %}
+
+            <!-- CANCEL BUTTON -->
+            <a href="{% url 'Leave:userleavecancel' leave.id %}"
+               class="btn btn-info btn-lg px-4 py-2"
+               data-toggle="tooltip" title="Cancel Leave">
+                <i class="fas fa-times-circle"></i> Cancel
+            </a>
+
+            <!-- REJECT BUTTON -->
+            <a href="{% url 'Leave:reject' leave.id %}"
+               class="btn btn-danger btn-lg px-4 py-2"
+               data-toggle="tooltip" title="Reject Leave">
+                <i class="fas fa-ban"></i> Reject
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<!-- Spinner -->
+<div id="spinner" class="d-none">
+    <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+{% endblock %}
+
+<script type="text/javascript">
+    {% block extrajs %}
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    {% endblock %}
+</script>

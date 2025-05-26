@@ -1,0 +1,199 @@
+{% extends 'layout.html' %}
+
+{% block title %} Employee Management {% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container
+    {
+        max-width:1050px !important;
+    }
+    h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #343a40;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        margin-top: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th {
+        background-color: #f4f4f4;
+        color: #fff;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+
+    .table td {
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    .btn-black {
+        background-color: #343a40;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-black:hover {
+        background-color: #495057;
+        color: #fff;
+    }
+
+    .pagination .btn {
+        margin: 0 5px;
+    }
+
+    .alert {
+        font-size: 1rem;
+        margin-top: 15px;
+    }
+
+    .no-employees {
+        text-align: center;
+        font-size: 18px;
+        color: #6c757d;
+    }
+
+    .action-buttons .btn {
+        margin-right: 5px;
+    }
+
+    /* Animation for row fade-out when deleting */
+    .fade-out {
+        opacity: 0;
+        transform: scale(0.9);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .table th,
+        .table td {
+            font-size: 12px;
+        }
+        h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">All Employees</h1>
+    <section class="table-wrapper">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                <tr>
+                    <th>Serial No</th>
+                    <th>Employee ID</th>
+                    <th>Full Name</th>
+                    <th>Department</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for employee in page_obj %}
+                <tr id="employee-row-{{ employee.id }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ employee.employeeid }}</td>
+                    <td>{{ employee.get_full_name }}</td>
+                    <td>{{ employee.department }}</td>
+                    <td>{{ employee.role }}</td>
+                    <td>{{ employee.email }}</td>
+                    <td>{{ employee.phone_number }}</td>
+                    <td class="action-buttons">
+                        <a href="{% url 'dashboard:employeeinfo' id=employee.id %}" class="btn btn-info btn-sm">View Profile</a>
+                        <form id="delete-form-{{ employee.id }}"
+                              action="{% url 'dashboard:delete_employee' id=employee.id %}"
+                              method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteEmployee({{ employee.id }});">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="no-employees">
+                        No employees found. <a href="{% url 'dashboard:employeecreate' %}" class="btn btn-sm btn-success">Add Employee</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination controls -->
+        <div class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <a href="?page=1" class="btn btn-secondary btn-sm">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>
+            {% endif %}
+
+            <span class="current mx-3">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary btn-sm">Last &raquo;</a>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<!-- JavaScript for delete animation -->
+<script>
+    function deleteEmployee(employeeId) {
+        const row = document.getElementById(`employee-row-${employeeId}`);
+        const form = document.getElementById(`delete-form-${employeeId}`);
+
+        // Add fade-out animation
+        row.classList.add('fade-out');
+
+        // Wait for animation to complete, then submit the form
+        setTimeout(() => {
+            form.submit();
+        }, 500); // 0.5s delay matches the CSS animation duration
+    }
+</script>
+
+<!-- CSS for fade-out animation -->
+<style>
+    .fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+</style>
+{% endblock %}

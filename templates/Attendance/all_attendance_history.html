@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+
+{% block title %}Attendance List{% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+    }
+    .container
+    {
+        max-width:1050px;
+    }
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        background-color: #ff5a0f;
+        color: white;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+        text-align: center;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        padding: 10px;
+        vertical-align: middle;
+    }
+
+    .table th {
+        background-color: #ffffff;
+        color: white;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 14px;
+        margin: 5px;
+    }
+
+    .text-success { color: #28a745; }
+    .text-warning { color: #ffc107; }
+    .text-danger { color: #dc3545; }
+
+    /* Add a bit of styling for responsiveness */
+    .container {
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<br><br><br>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h5>All Employees Attendance History</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table id="attendanceTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Employee Name</th>
+                            <th>Date</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Total Working Hours</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in attendance_records %}
+                        <tr>
+                            <td>{{ record.employee.employeeid }}</td>
+                            <td>{{ record.user.username }}</td>
+                            <td>{{ record.date|date:"M d, Y" }}</td>
+                            <td>{{ record.time_in|date:"h:i A" }}</td>
+                            <td>{{ record.time_out|date:"h:i A" }}</td>
+                            <td>{{ record.total_hours }}</td>
+                            <td>
+                                {% if record.time_out %}
+                                    <span class="text-success">Present</span>
+                                {% elif record.time_in %}
+                                    <span class="text-warning">Checked In</span>
+                                {% else %}
+                                    <span class="text-danger">Absent</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7">No attendance records found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery & DataTables -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#attendanceTable').DataTable({
+            "order": [[2, "desc"]],
+            "pageLength": 10,
+            "lengthMenu": [10, 25, 50, 100],
+            "responsive": true
+        });
+    });
+</script>
+{% endblock %}

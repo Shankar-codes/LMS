@@ -1,0 +1,193 @@
+{% extends 'layout.html' %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<style>
+    /* General Body Styling */
+    body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background-color: #f4f7fc;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Container for the form */
+    .form-wrapper {
+        max-width: 550px;
+        margin: 50px auto;
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.8s ease-out;
+        overflow: hidden;
+    }
+
+    /* Fade-in Animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Form Title */
+    .form-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    /* Input Field Styles */
+    .form-container input, .form-container select, .form-container textarea {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .form-container input:focus, .form-container select:focus, .form-container textarea:focus {
+        border-color: #0069d9;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 105, 217, 0.5);
+    }
+
+    .form-container textarea {
+        resize: vertical;
+    }
+
+    /* Submit Button Styles */
+    .form-submit-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #0069d9;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        text-transform: uppercase;
+    }
+
+    .form-submit-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .form-submit-btn:active {
+        background-color: #003d7a;
+    }
+
+    /* Alert Box Styling */
+    .alert {
+        padding: 10px;
+        margin-bottom: 15px;
+        font-size: 16px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .alert-success {
+        background-color: #82b72a;
+        color: #fff;
+    }
+
+    .alert-warning {
+        background-color: #fd7b7b;
+        color: #fff;
+    }
+
+    .alert button {
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .alert button:hover {
+        color: #000;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .form-wrapper {
+            padding: 20px;
+            margin: 15px;
+        }
+
+        .form-submit-btn {
+            padding: 14px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <section class="form-wrapper">
+            <!-- Displaying messages -->
+            <section class="row">
+                <section class="col col-sm-8 offset-sm-2">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert {{ message.tags }}">
+                        {{ message }}
+                        <button type="button" class="close" id="override-start" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </section>
+            </section>
+
+            <!-- Form Title -->
+            <section class="row">
+                <section class="col-lg-12 col-md-12 col-sm-12">
+                    <h3 class="form-title">Add User</h3>
+                </section>
+            </section>
+
+            <!-- Form Section -->
+            <section class="row">
+                <section class="col-lg-12 col-md-12 col-sm-12">
+                    <form action="" method="POST" class="form-container">
+                        {% csrf_token %}
+                        {{ form | crispy }}
+                        <button type="submit" class="form-submit-btn">Submit</button>
+                    </form>
+                </section>
+            </section>
+
+        </section>
+
+    </section> <!-- /container -->
+</section>
+{% endblock %}
+
+
+{% block extrajs %}
+<script type="text/javascript">
+    // JavaScript functionalities for user form can go here
+</script>
+{% endblock %}

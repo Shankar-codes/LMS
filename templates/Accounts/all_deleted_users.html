@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+<!-- CONTENTS -->
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <section class="row">
+            <section class="col col-lg-12 text-center">
+                <h3 class="title-h3 text-muted mb-4">List of Deleted Users</h3>
+            </section>
+        </section>
+
+        <!-- TABLE -->
+        <section class="table-wrapper">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <table class="table table-bordered table-striped table-responsive-lg">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col"><b>Username</b></th>
+                    <th scope="col"><b>Employee</b></th>
+                    <th scope="col"><b>Department</b></th>
+                    <th scope="col"><b>Action</b></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for emp in employees %}
+                <tr>
+                    <td>{{ emp.user.username }}</td>
+                    <td>{{ emp.get_full_name }}</td>
+                    <td>{{ emp.department }}</td>
+                    {% if emp.user.is_active %}
+                    <td>active</td>
+                    {% else %}
+                    <td>inactive</td>
+                    {% endif %}
+
+                    {% if emp.user.is_active and emp.user.is_superuser %}
+                    <!-- Admin cannot block self -->
+                    <td style="font-style:italic;">(admin)</td>
+                    {% elif emp.user.is_active %}
+                    <td><a href="{% url 'accounts:userblock' emp.user.id %}" title="block user"><i
+                            class="pe-7s-unlock"></i></a></td>
+                    {% else %}
+                    <td><a href="{% url 'accounts:userunblock' emp.user.id %}" title="unblock user"><i
+                            class="pe-7s-lock"></i></a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                </tbody>
+
+            </table>
+        </section>
+    </section>
+</section>
+{% endblock %}
+<script type="text/javascript">
+    {% block extrajs%}
+    <!--/*create-user-button - handler*/-->
+
+    <!-- $(document).ready(function(){-->
+
+    <!-- var createuser = $('.create-user-model');-->
+    <!-- createuser.on('click',function(){-->
+    <!-- alert("who clicked me ?")-->
+
+    <!-- });-->
+
+
+    <!-- });-->
+
+    {% endblock %}
+</script>

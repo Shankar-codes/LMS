@@ -1,0 +1,267 @@
+{% extends 'layout.html' %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<style>
+    /* General Reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Arial', sans-serif;
+        line-height: 1.6;
+        background-color: #f4f6f9;
+        color: #333;
+    }
+
+    /* Font Awesome Icons */
+    .fa-eye, .fa-pencil {
+        margin-right: 8px;
+    }
+
+    /* Header & Table Styling */
+    .table-shadow {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h4 {
+        margin: 10px 0 20px;
+        font-size: 26px;
+        font-weight: 600;
+        color: #444;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-align: center;
+    }
+
+    .table-description {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .total-leaves-count p {
+        font-size: 16px;
+        color: #777;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    /* Table Design */
+    table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        font-size: 16px;
+        color: #555;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f1f1f1;
+        color: #333;
+        font-weight: bold;
+    }
+
+    td {
+        background-color: #fafafa;
+    }
+
+    tr:hover td {
+        background-color: #f9fafb;
+    }
+
+    /* Badge Styling */
+    .badge {
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    /* Action Links */
+    .action-links a {
+        font-size: 16px;
+        text-decoration: none;
+        color: #007bff;
+        padding: 0 12px;
+        font-weight: 500;
+        transition: color 0.3s, transform 0.2s;
+    }
+
+    .action-links a:hover {
+        color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    .action-links a.delete {
+        color: #e53935;
+    }
+
+    .action-links a.delete:hover {
+        color: #c62828;
+    }
+
+    /* Button Styling */
+    .btn-style {
+        background: #007bff;
+        color: #fff;
+        font-size: 16px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .btn-style:hover {
+        background-color: #0056b3;
+    }
+
+    /* Alert Messages */
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .alert-warning {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .alert .close {
+        color: inherit;
+        background: none;
+        border: none;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .alert .close:hover {
+        cursor: pointer;
+    }
+
+    /* Responsiveness */
+    @media (max-width: 768px) {
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        h4 {
+            font-size: 22px;
+        }
+
+        .table-description p {
+            font-size: 14px;
+        }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <section class="row">
+            <section class="col-sm-8 offset-sm-2">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {{ message.tags }}" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </section>
+        </section>
+
+        <!-- Table Section -->
+        <div class="table-responsive table-shadow">
+            <div class="text-center table-description">
+                <h4>Approved Leaves</h4>
+            </div>
+
+            <section class="total-leaves-count">
+                {% if leave_list %}
+                <p>Total Approved Leaves: <strong>{{ leave_list.count }}</strong></p>
+                {% endif %}
+            </section>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Day(s)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for leave in leave_list %}
+                <tr>
+                    <td>{{ leave.user }}</td>
+                    <td>{{ leave.leavetype }}</td>
+                    <td>{{ leave.leave_days }}</td>
+                    <td><span class="badge badge-success">{{ leave.status }}</span></td>
+                    <td class="action-links">
+                        <a href="{% url 'Leave:userleaveview' leave.id %}" class="view">
+                            View
+                        </a>
+                        <form action="{% url 'Leave:userleaveunapprove' leave.id %}" method="POST"
+                              style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Are you sure you want to unapprove this leave?');">
+                                Unapprove
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /Table Section -->
+    </section>
+</section>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    // Additional JavaScript code goes here
+</script>
+{% endblock %}

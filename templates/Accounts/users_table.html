@@ -1,0 +1,238 @@
+{% extends 'layout.html' %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+/* Modernizing fonts and icons */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+font-family: 'Poppins', sans-serif;
+}
+
+.pe-7s-lock, .pe-7s-unlock {
+font-size: 18px;
+font-weight: 700;
+}
+
+.pe-7s-unlock {
+color: #28a745; /* Modern green */
+}
+
+.pe-7s-lock {
+color: #dc3545; /* Modern red */
+}
+
+.table-shadow {
+background: #fff;
+padding: 20px;
+border-radius: 12px; /* Rounded corners */
+box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Softer shadow */
+margin-top: 30px;
+transition: box-shadow 0.3s ease;
+}
+
+.table-shadow:hover {
+box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Hover effect for table */
+}
+
+.table-description {
+margin-bottom: 20px;
+}
+
+.download-print-action {
+padding-bottom: 15px;
+font-size: 16px;
+font-weight: 600;
+margin-bottom: 20px;
+text-align: right;
+}
+
+.btn-download {
+margin-left: 10px;
+color: #fff;
+background: linear-gradient(145deg, #007bff, #0056b3); /* Modern blue gradient */
+border-radius: 8px;
+padding: 10px 20px;
+text-decoration: none;
+font-size: 14px;
+transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.btn-download:hover {
+background: linear-gradient(145deg, #0056b3, #007bff);
+transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.table-hover tbody tr:hover {
+background-color: #f1f3f5; /* Lighter background on hover */
+}
+
+.table td, .table th {
+vertical-align: middle;
+text-align: center;
+padding: 12px;
+}
+
+.table td a {
+text-decoration: none;
+color: #007bff; /* Action link color */
+transition: color 0.3s ease;
+}
+
+.table td a:hover {
+color: #0056b3; /* Darker blue on hover */
+}
+
+.title-h3 {
+font-size: 28px;
+font-weight: 700;
+margin-bottom: 20px;
+color: #333; /* Darker text for better contrast */
+}
+
+.table th {
+background-color: #f8f9fa; /* Light background for headers */
+font-weight: 600;
+}
+
+.table-striped tbody tr:nth-child(odd) {
+background-color: #f9f9f9; /* Zebra striping */
+}
+
+.text-success {
+color: #28a745 !important;
+}
+
+.text-danger {
+color: #dc3545 !important;
+}
+
+.tooltip-inner {
+background-color: #333;
+color: #fff;
+}
+
+{% endblock %}
+
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <div class="table-shadow">
+            <div class="text-center table-description">
+                <h4 class="title-h3">Application Users</h4>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="download-print-action">
+                        <a href="#" class="btn-download" id="downloadExcel" title="Download as Excel">Download Excel</a>
+                        <a href="#" class="btn-download" data-toggle="tooltip" title="Download as PDF">Download PDF</a>
+                        <a href="#" class="btn-download" id="printTable" title="Print">Print</a>
+                    </div>
+                </div>
+            </div>
+
+            	<table class="table">
+							  <thead>
+							    <tr>
+							      <th scope="col">Username</th>
+							      <th scope="col">Employee (fullname) </th>
+							      <th scope="col">Department</th>
+							      <th scope="col">Status</th>
+							      <th scope="col">Actions</th>
+							    </tr>
+							  </thead>
+
+							  <tbody>
+							  	{% for emp in employees %}
+							  	<tr>
+								      <td>{{emp.user.username}}</td>
+								      <td>{{ emp.get_full_name }}</td>
+								      <td>{{ emp.department }}</td>
+								      {% if emp.user.is_active %}
+								      <td>active</td>
+								      {% else %}
+								      <td>inactive</td>
+								      {% endif %}
+
+								      {%  if emp.user.is_active and emp.user.is_superuser %}
+								      <!-- Admin cannot block self -->
+								      <td style="font-style:italic;">(admin)</td>
+								      {% elif emp.user.is_active %}
+									<td style="font-style:italic;">(staff)</td>
+									{% elif emp.user.is_active %}
+								      <td><a href="{% url 'accounts:userblock' emp.user.id %}" title="block user"><i class="pe-7s-unlock"></i></a></td>
+								      {% else %}
+								      <td><a href="{% url 'accounts:userunblock' emp.user.id %}" title="unblock user"><i class="pe-7s-lock"></i></a></td>
+								      {% endif %}
+
+
+							  </tr>
+							   {% endfor %}
+							  </tbody>
+						</table>
+        </div>
+    </section>
+</section>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    // Function to get the CSRF token from the hidden form (if needed for other AJAX requests)
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    $(document).ready(function() {
+        // Enable tooltips using jQuery (requires Bootstrap's tooltip JS, if you're using it)
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Function to print the table
+        $('#printTable').click(function() {
+            var printContents = document.getElementById('userTable').outerHTML;
+            var originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+        });
+
+        // Function to download table as Excel using Blob
+        $('#downloadExcel').click(function() {
+            var table = document.getElementById('userTable');
+            var html = table.outerHTML;
+            // Create a blob object with Excel MIME type
+            var blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+            // Create an object URL for the blob
+            var url = URL.createObjectURL(blob);
+            // Create a temporary link element
+            var link = document.createElement('a');
+            link.href = url;
+            // Use the .xls extension for better compatibility with Excel
+            link.download = 'users_data.xls';
+            // Append the link to the body (needed for Firefox)
+            document.body.appendChild(link);
+            // Programmatically click the link to trigger the download
+            link.click();
+            // Clean up by removing the link and revoking the object URL
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+
+        // Function to download table as PDF using jsPDF and autoTable
+        $('#downloadPDF').click(function() {
+            // Using the jsPDF UMD namespace; adjust if you're using a different version
+            const { jsPDF } = window.jspdf;
+            var doc = new jsPDF();
+            // Use autoTable to create a table from the HTML table with id "userTable"
+            doc.autoTable({ html: '#userTable' });
+            doc.save('users_data.pdf');
+        });
+    });
+</script>
+{% endblock %}
+

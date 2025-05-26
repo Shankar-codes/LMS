@@ -1,0 +1,229 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<style>
+    /* Global Styles */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f4f7fa; /* Soft background color */
+    }
+
+    
+
+    /* Form Wrapper Styles */
+    .form-wrapper {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;  /* Reduced padding */
+        background: linear-gradient(135deg, #ffffff, #f9f9f9);
+        border-radius: 12px;
+        max-width: 500px; /* Reduced max width */
+        margin: 30px auto;
+        border: 1px solid #e1e1e1;
+    }
+
+    .form-wrapper h3 {
+        font-size: 24px; /* Reduced font size */
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Form Fields Layout */
+    .form-wrapper .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-wrapper label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Input fields */
+    .form-wrapper input,
+    .form-wrapper select,
+    .form-wrapper textarea {
+        width: 100%;
+        padding: 8px; /* Reduced padding */
+        margin-bottom: 12px; /* Reduced margin */
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #333;
+        background-color: #fafafa;
+        transition: all 0.3s ease;
+    }
+
+    /* Input Focus */
+    .form-wrapper input:focus,
+    .form-wrapper select:focus,
+    .form-wrapper textarea:focus {
+        border-color: #42a5f5;
+        box-shadow: 0 0 6px rgba(66, 165, 245, 0.5);
+        outline: none;
+    }
+
+    /* Button Styles */
+    .btn-primary {
+        font-size: 14px;
+        padding: 8px 20px;
+        border-radius: 30px;
+        background-color: #1d75cd;
+        border: none;
+        color: white;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+    .form-wrapper .btn-lg:hover {
+        background: linear-gradient(135deg, #1e88e5, #1565c0);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Half-Day Fields */
+    .half-day-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    /* Flex Layout for Date and Time Fields */
+    .form-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;  /* Space between the fields */
+    }
+
+    /* Responsiveness */
+    @media (max-width: 768px) {
+        .form-wrapper {
+            padding: 15px;
+            margin: 10px;
+        }
+
+        .form-wrapper h3 {
+            font-size: 22px;
+        }
+
+        .form-wrapper .btn-lg {
+            font-size: 13px;
+            padding: 8px 20px;
+        }
+
+        .form-row {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <section class="form-wrapper">
+            <section class="row">
+                <section class="col-lg-12">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </section>
+            </section>
+
+            <section class="row">
+                <section class="col-lg-12 text-center">
+                    <h3 class="title-h3">{{ title }}</h3>
+                </section>
+            </section>
+
+            <section class="row">
+                <section class="col-lg-12">
+                    <form id="leaveForm" method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Error:</strong> Please correct the errors below.
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </section>
+            </section>
+        </section>
+    </section>
+</section>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let leaveTypeField = document.getElementById("id_leavetype");
+        let timeFields = document.getElementById("half-day-time-fields");
+
+        function toggleTimeFields() {
+            if (leaveTypeField.value === "half day") {
+                timeFields.style.display = "block";
+            } else {
+                timeFields.style.display = "none";
+            }
+        }
+
+        leaveTypeField.addEventListener("change", toggleTimeFields);
+        toggleTimeFields();  // Ensure correct visibility on page load
+
+        // Handle form submission with AJAX
+        document.getElementById('leaveForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get form data
+            const formData = new FormData(this);
+
+            // Send the data to the backend API
+            fetch('{% url "Leave:api_create_leave" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'), // Include CSRF token
+                },
+                body: formData,
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.id) {
+                        // Display success message
+                        alert('Leave request submitted successfully!');
+                        window.location.href = '{% url "Leave:createleave" %}'; // Redirect or reload the page
+                    } else {
+                        // Display error message
+                        alert('Error: ' + (data.error || 'Failed to submit leave request.'));
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        });
+    });
+</script>
+{% endblock %}

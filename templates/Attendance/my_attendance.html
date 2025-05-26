@@ -1,0 +1,163 @@
+{% extends 'layout.html' %}
+
+{% block title %}Attendance List{% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #000000;
+        padding: 20px;
+    }
+    .container
+    {
+        max-width:1050px;
+    }
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        background-color:#f57e53;
+        color: white;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+        text-align: center;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        padding: 8px;
+    }
+
+    .table th {
+        background-color: ;
+        color: white;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .text-success { color: #28a745; }
+    .text-warning { color: #ffc107; }
+
+    @media (max-width: 768px) {
+        .table th, .table td { padding: 6px; font-size: 14px; }
+        .btn { font-size: 12px; padding: 6px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<br>
+<br>
+<br>
+<br>
+<div class="container">
+    <div class="card">
+
+        <div class="card-header">
+            <h5>My Attendance</h5>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-3">
+                <input type="text" class="form-control" id="username" value="{{ user.username }}" readonly>
+                <input type="text" class="form-control" id="employee_id" value="{{ employee.employeeid }}" readonly>
+
+                <button id="btn_clock_in" class="btn btn-primary mt-2">Check In</button>
+                <button id="btn_clock_out" class="btn btn-danger mt-2">Check Out</button>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Total Working Hours</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for record in attendance_records %}
+                <tr>
+                    <td>{{ record.date|date:"M d, Y" }}</td>
+                    <td>{{ record.time_in|date:"h:i A" }}</td>
+                    <td>{{ record.time_out|date:"h:i A" }}</td>
+                    <td>{{ record.total_hours }}</td>
+                    <td>{% if record.time_out %}<span class="text-success">In/Out</span>{% else %}<span
+                            class="text-warning">In</span>{% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No attendance records found.</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        function getCSRFToken() {
+            return '{{ csrf_token }}';
+        }
+
+        function showSuccessPopup(message) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: message,
+                showConfirmButton: false,
+                timer: 2000  // Auto-close after 2 seconds
+            });
+        }
+
+        function showErrorPopup(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: message,
+                confirmButtonColor: '#d33'
+            });
+        }
+
+        $("#btn_clock_in").click(function() {
+            $.post("{% url 'attendance:clock_in' %}", {
+                'employee_id': '{{ user.username }}',
+                'csrfmiddlewaretoken': getCSRFToken()
+            }).done(function(response) {
+                showSuccessPopup(response.message);
+                setTimeout(function() { location.reload(); }, 2000);
+            }).fail(function(xhr) {
+                showErrorPopup(xhr.responseText);
+            });
+        });
+
+        $("#btn_clock_out").click(function() {
+            $.post("{% url 'attendance:clock_out' %}", {
+                'employee_id': '{{ user.username }}',
+                'csrfmiddlewaretoken': getCSRFToken()
+            }).done(function(response) {
+                showSuccessPopup(response.message);
+                setTimeout(function() { location.reload(); }, 2000);
+            }).fail(function(xhr) {
+                showErrorPopup(xhr.responseText);
+            });
+        });
+    });
+
+</script>
+{% endblock %}

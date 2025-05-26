@@ -1,0 +1,108 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+    }
+    .content-container {
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+    .content-container h1 {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+    .leave-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .leave-table th, .leave-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+    }
+    .leave-table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+        color: #555;
+    }
+    .leave-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .leave-table tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
+
+<div class="content-container">
+
+    {% if message %}
+        <p style="text-align: center; color: red;">{{ message }}</p>
+    {% else %}
+    <h1>Leave Balance</h1>
+    <h5 align="center">Total Leaves per Employee: 25</h5>
+    <p>Total leaves {{ remaining_total_leave }}</p>
+    <table class="leave-table">
+        <thead>
+            <tr>
+                <th>Leave Type</th>
+                <th>Used</th>
+                <th>Remaining</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Annual Leave</td>
+                <td>{{ used_annual_leave }}</td>
+                <td>{{ annual_leave }}</td>
+            </tr>
+            <tr>
+                <td>Sick Leave</td>
+                <td>{{ used_sick_leave }}</td>
+                <td>{{ sick_leave }}</td>
+            </tr>
+            <tr>
+                <td>Earned Leave</td>
+                <td>{{ used_earned_leave }}</td>
+                <td>{{ earned_leave }}</td>
+            </tr>
+            <tr>
+                <td>Loss of Pay</td>
+                <td>{{ used_loss_of_pay }}</td>
+                <td>{{ loss_of_pay }}</td>
+            </tr>
+            <tr>
+                <td>Work From Home</td>
+                <td>{{ used_work_from_home }}</td>
+                <td>{{ work_from_home }}</td>
+            </tr>
+            <tr>
+                <td>Emergency Leave</td>
+                <td>{{ used_emergency_leave }}</td>
+                <td>{{ emergency_leave }}</td>
+            </tr>
+            <tr>
+                <td>Casual Leave</td>
+                <td>{{ used_casual_leave }}</td>
+                <td>{{ casual_leave }}</td>
+            </tr>
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endblock %}

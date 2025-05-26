@@ -1,0 +1,214 @@
+{% load static %}
+{% load humanize %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>LMS.in {% block title %} {{ title }} {% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/Logo/favicon.ico' %}">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+    <meta name="viewport" content="width=device-width"/>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Anton|Russo+One" rel="stylesheet">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"/>
+
+    <!-- Animation library for notifications -->
+    <link href="{% static 'css/animate.min.css' %}" rel="stylesheet"/>
+
+    <!-- Light Bootstrap Table core CSS -->
+    <link href="{% static 'css/light-bootstrap-dashboard.css' %}" rel="stylesheet"/>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-notify@3.1.3/dist/bootstrap-notify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-notify@3.1.3/dist/bootstrap-notify.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style type="text/css">
+        .title-h3 {
+            font-weight: bold;
+            font-variant: petite-caps;
+        }
+
+        /* Sidebar hover effect */
+        .sidebar {
+            -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+            transition: all 400ms ease-in;
+        }
+
+        .sidebar:hover {
+            -webkit-box-shadow: 0 8px 17px 2px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 17px 2px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
+        }
+
+        /* Sidebar item hover animation */
+        .sidebar .nav li a {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav li:hover a {
+            background-color: #e74c3c; /* Red hover color */
+            transform: scale(1.1); /* Slight scale up on hover */
+        }
+
+        /* Slide in main content animation */
+        .main-panel {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Button hover effect */
+        .btn-primary {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #e74c3c;
+            transform: scale(1.1);
+        }
+
+        .shadow {
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+        }
+
+        a.simple-text {
+            font-family: 'Russo One', sans-serif;
+        }
+
+        a.simple-text > span {
+            font-size: 13px !important;
+        }
+
+        .logo a {
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        .sub-title {
+            vertical-align: -webkit-baseline-middle;
+            font-size: 12px;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        tr td {
+            font-variant: petite-caps;
+        }
+
+        {% block stylesheet %}
+        {% endblock %}
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="sidebar" data-color="red" data-image="{% static 'images/sidebar.jpg' %}">
+        <div class="sidebar-wrapper">
+            <div class="logo">
+                <a href="{% url 'dashboard:dashboard' %}" class="simple-text">Leave Management System</a>
+            </div>
+
+
+            <ul class="nav">
+                <li class="active">
+                    <a href="{% url 'dashboard:dashboard' %}">
+                        <i class="fa fa-tachometer-alt"></i> <!-- Dashboard Icon -->
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="{% url 'accounts:user_profile_view' %}">
+                        <i class="fa fa-user-tie"></i> <!-- Employee Icon -->
+                        <p>Profile</p>
+                    </a>
+                </li>
+
+
+                {% if request.user.is_staff %}
+
+
+                <li class="active">
+                    <a href="{% url 'dashboard:employees' %}">
+                        <i class="fas fa-users"></i> <!-- Employee Icon -->
+                        <p>Employee Section</p>
+                    </a>
+                </li>
+                {% endif %}
+
+
+                <li class="active">
+                    {% if request.user.is_superuser %}
+                    <a href="{% url 'Leave:leaveslist' %}">
+                        {% else %}
+                        <a href="{% url 'Leave:staffleavetable' %}">
+                            {% endif %}
+                            <i class="fa fa-calendar-alt"></i> <!-- Leave Icon -->
+                            <p>Leave Section</p>
+                        </a>
+                </li>
+                <li class="active">
+                    {% if request.user.is_superuser or user.is_staff %}
+                    {% if request.user.employee %}
+                    <a href="{% url 'attendance:my_attendance' employee_id=request.user.employee.id %}">
+                        {% else %}
+                        <a href="#"> <!-- Handle missing ID case -->
+                            {% endif %}
+                            {% else %}
+                            {% if request.user.employee %}
+                            <a href="{% url 'attendance:my_attendance' employee_id=request.user.employee.id %}">
+                            {% else %}
+                            <a href="#"> <!-- Handle missing ID case -->
+                                {% endif %}
+                                {% endif %}
+                                <i class="fa fa-user-check"></i>
+                                <p>Attendance</p>
+                            </a>
+                </li>
+
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="main-panel">
+        {% block navheader %}
+        {% include 'includes/navheader_default.html' %}
+        {% endblock %}
+        {% block content %}
+        <section class="content">
+            <section class="container-fluid"></section>
+        </section>
+        {% endblock %}
+    </div>
+</div>
+<!-- Core JS Files -->
+<script src="{% static 'js/jquery.3.2.1.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/bootstrap.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/chartist.min.js' %}"></script>
+<script src="{% static 'js/bootstrap-notify.js' %}"></script>
+<script src="{% static 'js/light-bootstrap-dashboard.js' %}"></script>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js">
+
+    {% block extrajs %}
+
+    {% endblock %}
+</script>
+</body>
+</html>

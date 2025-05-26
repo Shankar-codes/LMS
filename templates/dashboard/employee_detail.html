@@ -1,0 +1,269 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+
+{% load humanize %}
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<style>
+    body {
+        background-color: #f4f4f9; /* Light greyish background for a clean look */
+        font-family: 'Roboto', sans-serif; /* Modern font for readability */
+    }
+
+    .profile-wrapper {
+        background: #ffffff; /* White card-like background */
+        border-radius: 10px; /* Rounded corners for modern design */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .rounded-circle-image {
+        border-radius: 50% !important;
+        width: 250px;
+        height: 250px;
+        border: 5px solid #95b8dd;
+    }
+
+    .employee-name-title {
+        color: #3873b1; /* Highlight primary color */
+        font-weight: 700;
+        font-size: 2.5rem !important;
+        text-transform: uppercase;
+    }
+
+    .list-group-item {
+        background-color: #ffffff; /* Consistent card-like look */
+        border: none;
+        font-size: 1.1rem;
+        color: #333;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    }
+
+    .list-group-item > span {
+        font-weight: 500;
+        color: #555;
+    }
+
+    .list-group-item > div {
+        color: #000;
+    }
+
+    .panel-default > .panel-heading {
+        background-color: #f96e42;
+        color: #fff !important;
+        border-radius: 5px 5px 0 0;
+        padding: 10px;
+    }
+
+    .panel-title a {
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .panel-title a:hover {
+        color: #ddd;
+    }
+
+    .panel-body {
+        background-color: #ffffff; /* Card background */
+        padding: 20px;
+        border-radius: 0 0 5px 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .alert {
+        border-radius: 5px;
+        padding: 15px;
+    }
+
+    .alert-warning {
+        background-color: #ffcccc; /* Light red for warnings */
+        color: #900;
+    }
+
+    .alert-success {
+        background-color: #d4edda; /* Light green for success */
+        color: #155724;
+    }
+
+    .close {
+        color: #000;
+        font-size: 1.2rem;
+        font-weight: bold;
+        opacity: 0.6;
+    }
+
+    .close:hover {
+        color: #900;
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .rounded-circle-image {
+            width: 150px;
+            height: 150px;
+        }
+
+        .employee-name-title {
+            font-size: 1.8rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <section class="row">
+            <section class="col-12">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </section>
+        </section>
+        <section class="row text-center">
+            <h3><span class="employee-name-title">{{ employee.get_full_name }}</span></h3>
+        </section>
+        <section class="row">
+            <section class="col-lg-4 col-md-4 col-sm-12 profile-wrapper text-center">
+                {% if employee.image %}
+                <img src="{{ employee.image.url }}" class="img-fluid rounded-circle-image">
+                {% else %}
+                <img src="/media/default.png" class="img-fluid rounded-circle-image">
+                {% endif %}
+                <ul class="list-group mt-3">
+                    <li class="list-group-item"><span>Fullname</span>
+                        <div>{{ employee.get_full_name }}</div>
+                    </li>
+                    <li class="list-group-item"><span>Location</span>
+                        <div>{{ employee.location }}</div>
+                    </li>
+                    {% if employee.email %}
+                    <li class="list-group-item"><span>Email</span>
+                        <div>{{ employee.email }}</div>
+                    </li>
+                    {% endif %}
+                    <li class="list-group-item"><span>Department</span>
+                        <div>{{ employee.department }}</div>
+                    </li>
+                    <li class="list-group-item"><span>Employee Type</span>
+                        <div>{{ employee.employeetype }}</div>
+                    </li>
+                    <li class="list-group-item"><span>Role</span>
+                        <div>{{ employee.role }}</div>
+                    </li>
+                    <li class="list-group-item"><span>Employee Id</span>
+                        <div>{{ employee.employeeid }}</div>
+                    </li>
+                    <li class="list-group-item"><span>Date of Join</span>
+                        <div>{{ employee.dateissued }}</div>
+                    </li>
+                    <li class="list-group-item"><span>Age</span>
+                        <div>{% if employee.get_age %} {{ employee.get_age }} years {% else %} N/A {% endif %}</div>
+                    </li>
+                    <li class="list-group-item"><span>Status</span>
+                        <div>{{ employee.is_blocked|yesno:"Inactive,Active" }}</div>
+                    </li>
+                </ul>
+                <div>
+                    <span style="font-style: italic;">Updated - {{ employee.updated|naturaltime }}</span>
+                </div>
+            </section>
+
+            <section class="col-lg-8 col-md-8 col-sm-12">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingOne">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                                   aria-expanded="true" aria-controls="collapseOne">
+                                    PERSONAL INFORMATION
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel"
+                             aria-labelledby="headingOne">
+                            <div class="panel-body">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            {% if employee %}
+                                            {% if employee.firstname %}
+                                            <a class="list-group-item list-group-item-action"
+                                               href="#"><span>Firstname</span>
+                                                <div>{{ employee.firstname }}</div>
+                                            </a>
+                                            {% endif %}
+                                            {% if employee.lastname %}
+                                            <a class="list-group-item list-group-item-action"
+                                               href="#"><span>Lastname</span>
+                                                <div>{{ employee.lastname }}</div>
+                                            </a>
+                                            {% endif %}
+                                            {% if employee.gender %}
+                                            <a class="list-group-item list-group-item-action"
+                                               href="#"><span>Gender</span>
+                                                <div>{{ employee.get_gender_display }}</div>
+                                            </a>
+                                            {% endif %}
+                                            {% if employee.date_of_birth %}
+                                            <a class="list-group-item list-group-item-action" href="#"><span>Date of Birth</span>
+                                                <div>{{ employee.date_of_birth }}</div>
+                                            </a>
+                                            {% endif %}
+                                             {% if employee.degree %}
+                                            <a class="list-group-item list-group-item-action" href="#"><span>Degree</span>
+                                                <div>{{ employee.degree }}</div>
+                                            </a>
+                                            {% endif %}
+                                            {% if employee.address %}
+                                            <a class="list-group-item list-group-item-action"
+                                               href="#"><span>Address</span>
+                                                <div>{{ employee.address }}</div>
+                                            </a>
+                                            {% endif %}
+                                            {% if request.user.is_superuser %}
+                                            <div class="mt-3">
+                                                <a href="{% url 'dashboard:edit' employee.id %}"
+                                                   class="btn btn-primary">Edit</a>
+                                            </div>
+                                            {% endif %}
+                                            {% else %}
+                                            <h4>No Information found, to add click <a
+                                                    href="{% url 'dashboard:familycreate' %}">here</a></h4>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span>Last update - {{ employee.updated|naturaltime }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+</section>
+{% endblock %}
+
+<script type="text/javascript">
+    {% block extrajs %}
+    {% endblock %}
+</script>

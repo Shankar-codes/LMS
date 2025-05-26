@@ -1,0 +1,162 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+<style>
+    .fa-eye, .fa-pencil {
+        margin-right: 5px;
+    }
+
+    .table-shadow {
+        background: #fff;
+        padding: 2%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 4px 5px -2px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .table-description h4 {
+        margin: 2px 0 5px 0;
+        font-weight: bold;
+        text-shadow: 1px 1px rgba(0, 0, 0, 0.1);
+        font-size: 1.8rem;
+        color: #333;
+    }
+
+    .alert-warning {
+        background: #fd7b7b;
+        color: #fff;
+        font-size: 16px;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert-success {
+        background-color: #82b72a;
+        color: #fff;
+        font-size: 16px;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-responsive {
+        margin-top: 30px;
+        overflow-x: auto;
+    }
+
+    .table th {
+        background-color: #f1f1f1;
+        color: #333;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+    }
+
+    .table tbody tr {
+        background-color: #fff;
+        transition: background-color 0.3s ease;
+    }
+
+    .table tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+    }
+
+    .badge {
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 12px;
+    }
+
+    .badge-danger {
+        background-color: #d42828;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="content">
+    <section class="container-fluid">
+        <section class="row">
+            <section class="col col-sm-8 offset-sm-2">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close" id="override-start" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </section>
+        </section>
+
+        <!-- TABLE -->
+        <div class="table-responsive table-shadow">
+            <div class="text-center table-description">
+                <h3 class="title-h3" style="text-shadow: 1px 0px rgba(0, 0, 0, 0.11)">Rejected Leaves</h3>
+            </div>
+
+            <section class="total-leaves-count">
+                {% if leave_list_rejected %}
+                <p>Total Rejected Leaves - <span>{{ leave_list_rejected.count }}</span></p>
+                {% endif %}
+            </section>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col"><b>User</b></th>
+                    <th scope="col"><b>Type</b></th>
+                    <th scope="col"><b>Day(s)</b></th>
+                    <th scope="col"><b>Status</b></th>
+                    <th scope="col"><b>Actions</b></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for leave in leave_list_rejected %}
+                <tr>
+                    <td>{{ leave.user }}</td>
+                    <td>{{ leave.leavetype }}</td>
+                    <td>{{ leave.leave_days }}</td>
+                    <td>
+                                <span class="badge badge-danger">
+                                    {{ leave.status }}
+                                </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'Leave:userleaveview' leave.id %}" style="color: #795548;">
+                            <span>View &nbsp;</span>
+                        </a>
+
+                        {% if leave.is_rejected %}
+                        <a href="{% url 'Leave:unreject' leave.id %}" style="color:#bd0404;">Undo Reject</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- /TABLE -->
+    </section>
+</section>
+{% endblock %}
+
+<script type="text/javascript">
+    {% block extrajs %}
+    // You can add custom JavaScript here if needed
+    {% endblock %}
+</script>

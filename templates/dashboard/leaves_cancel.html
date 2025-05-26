@@ -1,0 +1,189 @@
+{% extends 'layout.html' %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block navheader %}
+{% include 'includes/navheader_employee_app.html' %}
+{% endblock %}
+
+{% block stylesheet %}
+/* General Styles */
+.fa-eye, .fa-pencil {
+margin-right: 5px;
+}
+
+body {
+font-size: 17px;
+background-color: #f4f6f9;
+color: #333;
+}
+
+.table-shadow {
+background: white;
+padding: 2%;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+border-radius: 8px;
+}
+
+h4 {
+margin: 2px 0 5px;
+font-size: 24px;
+font-weight: bold;
+color: #333;
+text-shadow: 1px 0px rgba(0, 0, 0, 0.11);
+}
+
+/* Alerts */
+.alert {
+font-size: 16px;
+padding: 10px 15px;
+border-radius: 5px;
+}
+
+.alert-warning {
+background: #fd7b7b;
+color: #fff;
+}
+
+.alert-success {
+background-color: #82b72a;
+color: #fff;
+}
+
+/* Table Styling */
+.table th, .table td {
+padding: 10px;
+text-align: center;
+vertical-align: middle;
+}
+
+.table th {
+background-color: #f2f2f2;
+font-weight: bold;
+}
+
+.table tbody tr:hover {
+background-color: #f7f7f7;
+cursor: pointer;
+}
+
+/* Action Buttons */
+.btn-action {
+padding: 5px 10px;
+font-size: 14px;
+color: white;
+background-color: #007bff;
+border: none;
+border-radius: 5px;
+text-decoration: none;
+margin: 0 5px;
+}
+
+.btn-action:hover {
+background-color: #0056b3;
+}
+
+.btn-danger {
+background-color: #d9534f;
+}
+
+.btn-danger:hover {
+background-color: #c9302c;
+}
+
+/* Section Styling */
+.container-fluid {
+padding: 20px;
+}
+
+.total-leaves-count p {
+font-size: 14px;
+color: #9d9d9d;
+}
+
+.title-h3 {
+font-size: 28px;
+text-transform: uppercase;
+font-weight: bold;
+color: #333;
+margin-bottom: 20px;
+}
+
+{% endblock %}
+
+{% block content %}
+<!-- Include this near the top of your template -->
+<form id="csrf-form" style="display:none;">
+    {% csrf_token %}
+</form>
+<section class="content">
+    <section class="container-fluid">
+        <section class="row">
+            <section class="col-sm-8 offset-sm-2">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="close" id="override-start" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </section>
+        </section>
+
+        <!-- Table for Cancelled Leaves -->
+        <div class="table-responsive table-shadow">
+            <div class="text-center table-description">
+                <h4 class="title-h3" style="text-shadow: 1px 0px rgba(0, 0, 0, 0.11)">Cancelled Leaves</h4>
+            </div>
+
+            <section class="total-leaves-count">
+                {% if leave_list_cancel %}
+                <p>Total Cancelled Leaves - <span>{{ leave_list_cancel.count }}</span></p>
+                {% endif %}
+            </section>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col"><b>User</b></th>
+                    <th scope="col"><b>Type</b></th>
+                    <th scope="col"><b>Day(s)</b></th>
+                    <th scope="col"><b>Status</b></th>
+                    <th scope="col"><b>Actions</b></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for leave in leave_list_cancel %}
+                <tr>
+                    <td>{{ leave.user }}</td>
+                    <td>{{ leave.leavetype }}</td>
+                    <td>{{ leave.leave_days }}</td>
+                    <td>{{ leave.status }}</td>
+                    <td>
+                        <a href="{% url 'Leave:userleaveview' leave.id %}" class="btn-action" style="color: #795548;">
+                            View
+                        </a>
+                        {% if not leave.is_approved %}
+                        <a href="{% url 'Leave:userleaveuncancel' leave.id %}" class="btn-action btn-danger">
+                            Undo Cancel
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- End Table -->
+
+    </section>
+</section>
+{% endblock %}
+
+<script type="text/javascript">
+    {% block extrajs %}
+        // Custom JavaScript code can be added here
+    {% endblock %}
